@@ -32,7 +32,7 @@ class NoteListActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
 
         binding.fab.setOnClickListener { view ->
-            val activityIntent = Intent(this,MainActivity::class.java)
+            val activityIntent = Intent(this,ItemList::class.java)
             startActivity(activityIntent)
         }
 //        binding.contentList.listNotes.adapter=ArrayAdapter(this, android.R.layout.simple_list_item_1,

@@ -3,8 +3,7 @@ package com.example.notekeeper
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
-import android.widget.LinearLayout
-import com.google.android.material.snackbar.Snackbar
+import android.view.MenuItem
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -13,15 +12,19 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.GravityCompat
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.notekeeper.databinding.ActivityItemListBinding
+import com.google.android.material.snackbar.Snackbar
 
-class ItemList : AppCompatActivity() {
+class ItemList : AppCompatActivity(),NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityItemListBinding
+
+    private val noteLayoutMagager by lazy { LinearLayoutManager(this) }
+
+    private val notesRecyclerAdapter by lazy { NotesRecyclerAdapter(this, DataManager.notes) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,8 +38,7 @@ class ItemList : AppCompatActivity() {
             val intent = Intent(this,MainActivity::class.java)
             startActivity(intent)
         }
-        binding.appItemList.listItems.layoutManager=LinearLayoutManager(this)
-        binding.appItemList.listItems.adapter= NotesRecyclerAdapter(this,DataManager.notes)
+
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_item_list)
@@ -44,12 +46,13 @@ class ItemList : AppCompatActivity() {
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow
+                R.id.nav_notes, R.id.nav_courses, R.id.nav_slideshow
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-
+       binding.appBarItemList.appBarItemList.listItems.layoutManager= noteLayoutMagager
+        binding.appBarItemList.appBarItemList.listItems.adapter=notesRecyclerAdapter
     }
 
 //    override fun onBackPressed() {
@@ -63,7 +66,7 @@ class ItemList : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        binding.appItemList.listItems.adapter?.notifyDataSetChanged()
+        binding.appBarItemList.appBarItemList.listItems.adapter?.notifyDataSetChanged()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -76,4 +79,27 @@ class ItemList : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_item_list)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.nav_notes->{
+                handleSelection("notes")
+            }
+            R.id.nav_courses->{
+                handleSelection("courses")
+            }
+            R.id.nav_share->{
+                handleSelection("Don't you think you've shared enough!")
+            }
+            R.id.nav_send->{
+                handleSelection("send")
+            }
+        }
+        return true
+    }
+
+    private fun handleSelection(message: String) {
+        Snackbar.make(binding.appBarItemList.appBarItemList.listItems,message,Snackbar.LENGTH_LONG).show()
+    }
+
 }
